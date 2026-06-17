@@ -90,6 +90,30 @@ python3 seek_search.py --detail https://www.seek.com.au/job/12345678
 Zero dependencies (Python 3.10+ stdlib only). Full docs in
 [`tools/seek-search/README.md`](tools/seek-search/README.md).
 
+## Job boards
+
+| Board | Status | Notes |
+|-------|--------|-------|
+| **SEEK** | ✅ Primary | `tools/seek-search` — search + full descriptions, no key |
+| **LinkedIn** | ⚠️ Optional, **off by default** | `tools/linkedin-search` — works with no key, but **automating LinkedIn is against its Terms of Service**; personal/low-volume use only, at your own risk |
+| **Indeed** | ❌ Not supported | Cloudflare/CAPTCHA-walled with no usable API. Paste an Indeed posting into `/apply` instead |
+
+### Optional: LinkedIn ⚠️
+
+`tools/linkedin-search` adds LinkedIn coverage via its guest endpoints (no login, no key).
+**LinkedIn's User Agreement prohibits automated access**, so this is **disabled by default in
+`/scrape`** and intended for personal, low-volume use only — it can get your IP rate-limited.
+SEEK is the primary, supported source. To opt in, run `/scrape linkedin`, or use the tool
+directly:
+
+```bash
+cd tools/linkedin-search
+python3 linkedin_search.py --keywords "AI Engineer" --where "Brisbane, Queensland, Australia" --table
+```
+
+See [`tools/linkedin-search/README.md`](tools/linkedin-search/README.md) for the full warning
+and options. If in doubt, don't use it — paste LinkedIn postings into `/apply` manually.
+
 ## Commands
 
 | Command | What it does |

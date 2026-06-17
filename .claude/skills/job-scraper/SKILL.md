@@ -35,6 +35,7 @@ Optional arguments:
 - A focus area, e.g. "/scrape ai" or "/scrape full stack"
 - "broad" to run all priority categories
 - "remote" to hard-filter to remote/hybrid roles
+- "linkedin" to ALSO query LinkedIn (opt-in only — see Step 2b; off by default for ToS reasons)
 
 ---
 
@@ -70,6 +71,20 @@ For founding-engineer / AI-startup coverage, run a few `WebSearch` queries over
 `wellfound.com`, `workatastartup.com`, and `job-boards.greenhouse.io`. Only fetch a posting
 with `WebFetch` if it looks like a strong match AND is not a SEEK URL (SEEK 403s). Verify
 Australia-eligibility before presenting — many board results are US-only.
+
+### Step 2b: LinkedIn (OPT-IN ONLY — never run by default)
+
+Only run this if the user explicitly opted in (said "linkedin", "/scrape linkedin", or asked
+for LinkedIn). **Do not query LinkedIn otherwise** — automating it is against LinkedIn's ToS,
+so it is off by default. When opted in, briefly remind the user it's at-their-own-risk, then:
+
+```bash
+cd tools/linkedin-search
+python3 linkedin_search.py --keywords "<role title>" --where "Australia" --days 30
+```
+
+Keep volume low (a few keyword calls). Merge LinkedIn results into the same dedup/ranking as
+SEEK. For a full description or `/apply`, use `linkedin_search.py --detail <id|url>`.
 
 ### Step 3: Deduplicate
 

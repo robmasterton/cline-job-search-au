@@ -36,7 +36,13 @@ python3 --version
 - **Windows:** <https://www.python.org/downloads/> (tick "Add to PATH")
 - **Linux:** usually preinstalled; else `sudo apt install python3`
 
-`seek-search` uses **only the standard library** — no `pip install` required.
+Both `seek-search` and the optional `linkedin-search` use **only the standard library** — no
+`pip install` required.
+
+> **Optional — LinkedIn (`tools/linkedin-search`):** works with no key and no login, but
+> **automating LinkedIn is against its Terms of Service.** It's **off by default** in
+> `/scrape` and is for personal, low-volume use at your own risk. SEEK is the primary,
+> supported source. See [`tools/linkedin-search/README.md`](tools/linkedin-search/README.md).
 
 ## 3. LaTeX (needed only when you run `/apply`)
 

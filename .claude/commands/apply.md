@@ -19,6 +19,11 @@ Follow these steps **exactly in order**. Do not skip steps.
   cd tools/seek-search && python3 seek_search.py --detail "<seek url or id>"
   ```
   This returns JSON with `title`, `company`, `location`, `salary`, `work_type`, `status`, `recruiter_phone`, and the full `description`. Use that as the posting content.
+- **If `$ARGUMENTS` is a linkedin.com/jobs URL (or LinkedIn job id):** use the optional LinkedIn CLI (at-your-own-risk; LinkedIn ToS) via Bash:
+  ```bash
+  cd tools/linkedin-search && python3 linkedin_search.py --detail "<linkedin url or id>"
+  ```
+  If it fails or you'd rather not, ask the user to paste the description instead.
 - If `$ARGUMENTS` is any other URL, use `WebFetch` to retrieve the job posting content.
 - If it is pasted text, use it directly.
 - Extract: **company name**, **role title**, **department** (if mentioned), and **location**. (Australian postings are in English.)

@@ -81,6 +81,7 @@ This repo is a job application workspace. Claude acts as a career advisor and ap
 - `cover_letters/` - LaTeX cover letters (custom cover.cls template)
 - `.claude/skills/` - AI skill definitions for the application workflow
 - `tools/seek-search/` - SEEK (Australia) job search CLI used by `/scrape` and `/apply`
+- `tools/linkedin-search/` - OPTIONAL LinkedIn CLI (off by default; ToS-grey, at your own risk)
 
 ## Workflow for New Job Applications
 1. User provides a job posting (URL or text)
