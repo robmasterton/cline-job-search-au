@@ -4,10 +4,7 @@
 
 # AI Job Search — Australia 🇦🇺
 
-An AI-powered job-application framework for the **Australian market**, built on
-[Claude Code](https://claude.com/claude-code). Fork it, fill in your profile, and let
-Claude search SEEK, evaluate fit, tailor your CV, write cover letters, and prep you for
-interviews.
+An AI-powered job-application framework for the **Australian market**, designed to work with any compatible AI assistant (e.g., Cline, Claude, ChatGPT, Gemini). Fork it, fill in your profile, and let the assistant search SEEK, evaluate fit, tailor your CV, write cover letters, and prep you for interviews.
 
 > This is an Australian adaptation of [MadsLorentzen/ai-job-search](https://github.com/MadsLorentzen/ai-job-search)
 > (a Danish-market framework). The core workflow is the same; the job-discovery layer has
@@ -17,7 +14,7 @@ interviews.
 
 ## What this is
 
-A structured workflow that turns Claude Code into a full job-application assistant:
+A structured workflow that turns your AI assistant into a full job-application assistant:
 
 ```
 /setup            /scrape                 /apply <seek-url | text>
@@ -58,18 +55,17 @@ Both work with nothing more than a browser `User-Agent`. No headless browser, no
 gh repo fork <your-username>/ai-job-search-au --clone
 cd ai-job-search-au
 
-# 2. Start Claude Code and build your profile
-claude
-/setup
+# 2. Start your AI assistant (e.g., Cline) and build your profile
+(Initiate the setup workflow by describing what you want to do, e.g., "Run setup")
 
 # 3. Search SEEK for matching roles
-/scrape
+(Initiate the scrape workflow by describing what you want to do, e.g., "Scrape for jobs")
 
 # 4. Apply to one — paste a SEEK URL directly (full description is auto-fetched)
-/apply https://www.seek.com.au/job/12345678
+(Initiate the apply workflow by describing what you want to do, e.g., "Apply to this job https://www.seek.com.au/job/12345678")
 ```
 
-See **[INSTALL.md](INSTALL.md)** for everything to install (Claude Code, Python, LaTeX) —
+See **[INSTALL.md](INSTALL.md)** for everything to install (Python, LaTeX, and an AI assistant of your choice) —
 including a **no-sudo LaTeX setup** that works on locked-down machines.
 
 ## The `seek-search` tool (works standalone too)
@@ -104,10 +100,9 @@ search + detail still work (it exits non-zero with a pointer to the fix if SEEK 
 ### Optional: LinkedIn ⚠️
 
 `tools/linkedin-search` adds LinkedIn coverage via its guest endpoints (no login, no key).
-**LinkedIn's User Agreement prohibits automated access**, so this is **disabled by default in
-`/scrape`** and intended for personal, low-volume use only — it can get your IP rate-limited.
-SEEK is the primary, supported source. To opt in, run `/scrape linkedin`, or use the tool
-directly:
+**LinkedIn\`s User Agreement prohibits automated access**, so this is **disabled by default in
+the scrape workflow** and intended for personal, low-volume use only — it can get your IP rate-limited.
+SEEK is the primary, supported source. To opt in, explicitly mention "include LinkedIn" when initiating the scrape workflow, or use the tool directly:
 
 ```bash
 cd tools/linkedin-search
@@ -117,16 +112,7 @@ python3 linkedin_search.py --keywords "AI Engineer" --where "Brisbane, Queenslan
 See [`tools/linkedin-search/README.md`](tools/linkedin-search/README.md) for the full warning
 and options. If in doubt, don't use it — paste LinkedIn postings into `/apply` manually.
 
-## Commands
 
-| Command | What it does |
-|---------|--------------|
-| `/setup` | Build your profile — from your CV, a pasted resume, or an interview |
-| `/scrape` | Search SEEK (+ startup boards) and rank results by fit |
-| `/apply <url-or-text>` | Evaluate fit -> draft tailored CV + cover letter -> reviewer agent -> compile PDFs |
-| `/expand` | Enrich your profile from public sources you've linked (GitHub, portfolio, etc.) |
-| `/upskill` | Gap analysis between your profile and tracked postings -> learning plan |
-| `/reset` | Wipe profile data to start over (asks for confirmation) |
 
 ## How `/apply` works
 
@@ -135,7 +121,7 @@ A **drafter–reviewer** workflow with mandatory PDF verification:
 1. **Parse** the posting — a SEEK URL is resolved to its full description via the GraphQL API; other URLs via WebFetch; or paste the text.
 2. **Evaluate fit** against your profile (skills, experience, culture, location, salary).
 3. **Draft** a tailored CV + cover letter in LaTeX.
-4. **Reviewer agent** (fresh context) researches the company and critiques the drafts.
+4. **Review and critique** the drafts inline. The AI assistant researches the company and critiques the drafts.
 5. **Revise**, then **compile & visually inspect** both PDFs (lualatex for the CV, xelatex for the cover letter) until the CV is exactly 2 pages with no orphaned headings and the cover letter is exactly 1 page.
 6. **Present** the finished files with a verification checklist.
 
@@ -143,8 +129,8 @@ All claims are checked against your real profile — the system never fabricates
 
 ## Privacy ⚠️
 
-Several files are **tracked by git** but get filled with your personal data by `/setup`
-(name, contact details, employment history, search targets). On a public fork, **don't push
+Several files are **tracked by git** but get filled with your personal data by the setup workflow
+(name, contact details, employment history, search targets). On a public fork, **don\`t push
 them.** The full list:
 
 - `CLAUDE.md`
@@ -178,7 +164,7 @@ the hook covers. See [INSTALL.md → Keeping your data private](INSTALL.md#keepi
 - **[Mikkel Krogsholm](https://github.com/mikkelkrogsholm)** — the original job-search skill pattern.
 - **[qinscode/SeekSpider](https://github.com/qinscode/SeekSpider)** — the SEEK API approach
   that `tools/seek-search` adapts (reduced here to a single zero-dependency script).
-- Built with [Claude Code](https://claude.com/claude-code) by [Anthropic](https://anthropic.com).
+- The AI assistant functionality can be provided by various LLM providers (e.g., Anthropic, OpenAI, Google Gemini) via compatible clients (e.g., Cline, VS Code).
 
 ## License
 

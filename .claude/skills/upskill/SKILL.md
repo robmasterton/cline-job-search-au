@@ -2,9 +2,9 @@
 name: upskill
 description: >
   Compares tracked job postings against the candidate profile to identify skill gaps and generate
-  a prioritized learning plan with study resources. Triggers on: /upskill, upskill, skill gaps,
+  a prioritized learning plan with study resources. Triggers on: upskill, skill gaps,
   what should I learn, learning plan
-allowed-tools: Read, Write, Glob, Grep, WebFetch, WebSearch
+# (Cline ignores allowed-tools metadata - manage via VS Code settings)
 ---
 
 # Upskill
@@ -13,21 +13,21 @@ allowed-tools: Read, Write, Glob, Grep, WebFetch, WebSearch
 
 ## Overview
 
-`/upskill` analyses jobs you have tracked and your current profile to identify skill gaps, then produces a heatmap of those gaps and a learning plan with concrete, web-searched study resources and a recommended study order.
+The upskill workflow analyses jobs you have tracked and your current profile to identify skill gaps, then produces a heatmap of those gaps and a learning plan with concrete, web-searched study resources and a recommended study order.
 
 ## Invocation
-
-- **`/upskill`** — aggregate mode: analyses all jobs in `job_search_tracker.csv`
-- **`/upskill <URL>`** — targeted mode: analyses a single job posting fetched from the URL
+You can start by saying "Upskill" or "Find skill gaps".
+- **No URL** --- aggregate mode: analyses all jobs in `job_search_tracker.csv`
+- **With a URL** --- targeted mode: analyses a single job posting fetched from the URL
 
 ---
 
 ## Step 1: Detect Mode
 
-Check whether the user provided a URL argument:
+Check what mode to use based on the user's request:
 
-- If the invocation was `/upskill` with no argument → **aggregate mode**
-- If the invocation was `/upskill <URL>` → **targeted mode**, store the URL for Step 2
+- If no URL argument is provided --- **aggregate mode**
+- If a URL is provided --- **targeted mode**, store the URL for Step 2
 
 In targeted mode, derive a slug from the job title and company for the report filename (e.g. `guardsix-senior-ai-engineer`). You will fetch the posting in Step 2.
 
@@ -36,9 +36,9 @@ In targeted mode, derive a slug from the job title and company for the report fi
 ### Aggregate mode
 1. Read `job_search_tracker.csv`. Extract all rows. The columns are:
    `date, company, sector, role, role_type, channel, status, contact_person, fit_rating, notes, cv_file, cover_letter_file, source`
-2. For each row, note the `role`, `company`, and `fit_rating`. The `fit_rating` column is a 0–100 score where 100 = perfect fit. You will use it to weight gaps — a lower fit rating means the role exposed more gaps.
+2. For each row, note the `role`, `company`, and `fit_rating`. The `fit_rating` column is a 0--100 score where 100 = perfect fit. You will use it to weight gaps --- a lower fit rating means the role exposed more gaps.
 3. Read `.claude/skills/job-application-assistant/01-candidate-profile.md` to get the candidate's current skills and experience.
-4. Check `upskill/` for the most recent aggregate report file (`report-YYYY-MM-DD.md`) — if one exists, note its date and load it for the diff in Step 8.
+4. Check `upskill/` for the most recent aggregate report file (`report-YYYY-MM-DD.md`) --- if one exists, note its date and load it for the diff in Step 8.
 
 ### Targeted mode
 1. Use WebFetch to retrieve the job posting from the URL.
@@ -46,14 +46,14 @@ In targeted mode, derive a slug from the job title and company for the report fi
 3. Read `.claude/skills/job-application-assistant/01-candidate-profile.md` for the candidate's current skills.
 4. No tracker data is used in targeted mode.
 
-## Step 3: Pass 1 — Hard Skill Diff
+## Step 3: Pass 1 --- Hard Skill Diff
 
 Extract required and preferred technical skills from each job source:
 
 ### Aggregate mode
-For each job row in the tracker, you do not have the full posting — use the `role`, `sector`, and `notes` columns to infer likely required skills. If the row has a `source` URL, you may optionally WebFetch it for more detail, but skip if the URL is missing or dead.
+For each job row in the tracker, you do not have the full posting --- use the `role`, `sector`, and `notes` columns to infer likely required skills. If the row has a `source` URL, you may optionally WebFetch it for more detail, but skip if the URL is missing or dead.
 
-Build a **skill frequency map**: for each extracted skill, count how many jobs mention it. Then apply a **fit weight**: for each job, multiply the skill count contribution by `(100 - fit_rating) / 100` — lower fit jobs contribute more to the gap score.
+Build a **skill frequency map**: for each extracted skill, count how many jobs mention it. Then apply a **fit weight**: for each job, multiply the skill count contribution by `(100 - fit_rating) / 100` --- lower fit jobs contribute more to the gap score.
 
 Final score for each skill: `sum of (fit_weight × occurrence)` across all jobs.
 
@@ -61,11 +61,11 @@ Final score for each skill: `sum of (fit_weight × occurrence)` across all jobs.
 Extract the explicit required and preferred skills from the fetched posting. Each skill gets equal weight (no fit weighting needed since there is only one job). List required skills before preferred skills, then sort alphabetically within each group.
 
 ### Diff against profile
-Remove any skill from the list that is already present in the candidate profile (`01-candidate-profile.md`). Be generous — if the profile mentions a skill in any form (e.g. "Python" covers "Python scripting"), remove it.
+Remove any skill from the list that is already present in the candidate profile (`01-candidate-profile.md`). Be generous --- if the profile mentions a skill in any form (e.g. "Python" covers "Python scripting"), remove it.
 
 What remains is the **hard skill gap list**. In aggregate mode, rank by score descending. In targeted mode, list required skill gaps before preferred skill gaps, then sort alphabetically within each group.
 
-## Step 4: Pass 2 — LLM Synthesis
+## Step 4: Pass 2 --- LLM Synthesis
 
 Now reason holistically about gaps that the hard skill diff would miss. Consider:
 
@@ -99,7 +99,7 @@ Format:
 | Medium | AWS (advanced) | Hard | 2/5 jobs, score 1.1 |
 | Low | ... | ... | ... |
 
-Print this table to the terminal as an intermediate output before continuing to the learning plan.
+Print this table as an intermediate output before continuing to the learning plan.
 
 In targeted mode, assign priority based on the job's own language: required skills → Critical or High, preferred skills → Medium, inferred gaps from LLM synthesis → Medium or Low.
 
@@ -120,9 +120,9 @@ For every **Critical** and **High** gap (and **Medium** gaps if fewer than 5 tot
    - Books for domain knowledge gaps
    - For each resource: name, URL, and one-line reason why it fits
 
-3. **Write a study direction** tailored to the candidate's existing background. For example: if the candidate knows Docker, say "Skip the containers basics module — go straight to the orchestration and networking sections." Be specific about what to skip and where to start.
+3. **Write a study direction** tailored to the candidate's existing background. For example: if the candidate knows Docker, say "Skip the containers basics module --- go straight to the orchestration and networking sections." Be specific about what to skip and where to start.
 
-4. **Estimate time to working proficiency** (e.g. "~20h", "~40h for a solid foundation"). Be realistic — err toward more rather than less.
+4. **Estimate time to working proficiency** (e.g. "~20h", "~40h for a solid foundation"). Be realistic --- err toward more rather than less.
 
 ### Group by theme
 
@@ -133,12 +133,12 @@ Example entry format:
 ```
 ### Cloud & Infrastructure
 
-**Kubernetes** `[Hard]` — ~20h
-- [Kubernetes for Absolute Beginners – KodeKloud](https://kodekloud.com) — hands-on labs, widely recommended on r/kubernetes for practical learners
-- [Official Kubernetes Docs: Concepts](https://kubernetes.io/docs/concepts/) — use as reference once you have the basics
-- [The Kubernetes Book – Nigel Poulton](https://leanpub.com/the-kubernetes-book) — concise, updated annually
+**Kubernetes** `[Hard]` --- ~20h
+- [Kubernetes for Absolute Beginners -- KodeKloud](https://kodekloud.com) --- hands-on labs, widely recommended on r/kubernetes for practical learners
+- [Official Kubernetes Docs: Concepts](https://kubernetes.io/docs/concepts/) --- use as reference once you have the basics
+- [The Kubernetes Book -- Nigel Poulton](https://leanpub.com/the-kubernetes-book) --- concise, updated annually
 
-Study direction: You already know Docker and containerisation — skip Chapter 1 on containers. Start at Pod scheduling and work through Services and Deployments. Focus on manifests and `kubectl` fluency before touching Helm.
+Study direction: You already know Docker and containerisation --- skip Chapter 1 on containers. Start at Pod scheduling and work through Services and Deployments. Focus on manifests and `kubectl` fluency before touching Helm.
 ```
 
 ## Step 7: Suggest Study Order
@@ -172,7 +172,7 @@ Format:
 Assemble the full report in this order:
 
 ```markdown
-# Upskill Report — YYYY-MM-DD
+# Upskill Report --- YYYY-MM-DD
 **Mode:** Aggregate (N jobs analysed) | Targeted: <Job Title> @ <Company>
 
 ---
@@ -199,9 +199,9 @@ Assemble the full report in this order:
 
 ### <Theme>
 
-**<Skill>** `[Type]` — ~Xh
-- [Resource 1](url) — reason
-- [Resource 2](url) — reason
+**<Skill>** `[Type]` --- ~Xh
+- [Resource 1](url) --- reason
+- [Resource 2](url) --- reason
 
 Study direction: ...
 
@@ -222,7 +222,7 @@ Study direction: ...
   - Slugify: lowercase, spaces → hyphens, strip special characters
   - Example: `upskill/report-2026-04-20-guardsix-senior-ai-engineer.md`
 
-Use the Write tool to save the file.
+Write the file using the Write tool.
 
 ### Diff section (aggregate mode only)
 
@@ -243,6 +243,6 @@ After saving, print:
 2. **Search with the current year.** Include the year in every WebSearch query for resources so results stay fresh.
 3. **Targeted mode ignores the tracker.** In targeted mode, analyse only the fetched posting. Do not load or reference `job_search_tracker.csv`.
 4. **Be generous with profile matching.** If a skill appears in the candidate profile in any form, do not flag it as a gap. Avoid false positives.
-5. **Print the heatmap before the learning plan.** Always show the intermediate heatmap table in the terminal before proceeding to resource search, so the user can see what you are working from.
+5. **Print the heatmap before the learning plan.** Always show the intermediate heatmap table before proceeding to resource search, so the user can see what you are working from.
 6. **Omit Low-priority gaps from the learning plan.** List them in the heatmap for completeness, but do not generate study resources for them unless the user asks.
 7. **Always save the report.** Do not skip the Write step even if the user seems satisfied with the terminal output.

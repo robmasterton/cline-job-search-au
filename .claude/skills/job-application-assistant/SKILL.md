@@ -4,7 +4,7 @@ description: >
   Assists with job applications: evaluating job postings, tailoring CVs, writing cover letters,
   and preparing for interviews. Triggers on keywords like: job posting, job application, CV,
   cover letter, resume, interview prep, job fit, career, application, apply, SEEK
-allowed-tools: Read, Glob, Grep, WebFetch, WebSearch, Edit, Write, AskUserQuestion
+# (Cline ignores allowed-tools metadata - manage via VS Code settings)
 ---
 
 # Job Application Assistant
@@ -13,34 +13,24 @@ allowed-tools: Read, Glob, Grep, WebFetch, WebSearch, Edit, Write, AskUserQuesti
 
 ## Workflow
 
-When the user provides a job posting (URL or text), follow this workflow:
+This skill helps you with job application steps. The full "Apply Workflow" is defined in `CLAUDE.md`, which covers:
 
-### Step 1: Research & Evaluate Fit
-- Fetch the job posting content (use WebFetch for URLs)
-- Analyze the posting for required competencies, keywords, and priorities
-- Research the company (website, LinkedIn, mission, recent news)
-- Score the posting against the candidate's profile using the framework in `04-job-evaluation.md`
-- Present the evaluation table and verdict
-- Suggest whether the candidate should call the employer before applying (see `04-job-evaluation.md` for guidance)
-- Ask the user if they want to proceed with an application
+- **Step 0: Parse Input** - How to handle URLs (SEEK, LinkedIn, other) or pasted text, and extract key job details.
+- **Step 1: Evaluate Fit** - Using `04-job-evaluation.md` and `01-candidate-profile.md` to assess the job and optionally incorporate salary benchmarks from `salary_lookup.py`.
+- **Step 2: Draft CV + Cover Letter** - Tailoring a CV (`cv/main_<company>.tex`) and cover letter (`cover_letters/cover_<company>_<role>.tex`) based on `03-writing-style.md`, `05-cv-templates.md`, and `06-cover-letter-templates.md`.
+- **Step 3: Review & Critique** - Performing an inline review of the drafts, researching the company, and providing structured edits and narrative suggestions.
+- **Step 4: Revise Based on Feedback** - Applying the suggested edits and revisions.
+- **Step 5: Compile & Inspect PDFs (MANDATORY)** - Compiling the LaTeX documents (`lualatex` for CV, `xelatex` for cover letter) and visually verifying the PDF output for layout, page count, and formatting.
+- **Step 6: Present Final Output** - Running a final verification checklist, summarizing tailoring decisions, and listing created files.
 
-### Step 2: Tailor CV
-- Read the most relevant existing CV variant from `cv/` as a starting point
-- Follow the guidelines in `05-cv-templates.md`
-- Create `cv/main_<company>.tex` with tailored content
-- Adjust: profile statement, skills section, experience bullet emphasis, section order
+For interview preparation, refer to the details in `07-interview-prep.md`.
 
-### Step 3: Write Cover Letter
-- Follow the writing style rules in `03-writing-style.md` (critical: no em-dashes, no cliches)
-- Follow the template structure in `06-cover-letter-templates.md`
-- Create `cover_letters/cover_<company>_<role>.tex`
-- Ensure the letter connects specific experience to the role requirements
-
-### Step 4: Interview Preparation
-- Follow the framework in `07-interview-prep.md`
-- Prepare STAR-format answers for likely questions
-- Identify role-specific talking points
-- Draft questions the candidate should ask the interviewer
+If you want to perform individual steps, you can ask for:
+- "Evaluate this job posting" - Focus on Step 1 only
+- "Write a CV for [company]" - Focus on drafting the CV (part of Step 2)
+- "Write a cover letter for [role] at [company]" - Focus on drafting the cover letter (part of Step 2)
+- "Help me prepare for an interview at [company]" - Focus on interview preparation (Step 4 from the old structure, now part of the overall guidance).
+- "What jobs should I look for?" - Career strategy discussion using profile + evaluation framework.
 
 ---
 
@@ -58,11 +48,4 @@ When the user provides a job posting (URL or text), follow this workflow:
 
 ---
 
-## Quick Commands
 
-The user may also ask for individual steps without the full workflow:
-- "Evaluate this job posting" - Step 1 only
-- "Write a CV for [company]" - Step 2 only
-- "Write a cover letter for [role] at [company]" - Step 3 only
-- "Help me prepare for an interview at [company]" - Step 4 only
-- "What jobs should I look for?" - Career strategy discussion using profile + evaluation framework

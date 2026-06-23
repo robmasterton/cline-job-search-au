@@ -4,7 +4,7 @@ description: >
   Searches the Australian job market (SEEK via the seek-search CLI, plus startup boards
   via web search) for new positions matching your profile. Deduplicates across runs.
   Triggers on: job scrape, find jobs, search jobs, new jobs, job search, scrape jobs, /scrape
-allowed-tools: Read, Write, Edit, Glob, Grep, Bash, WebFetch, WebSearch, Agent, AskUserQuestion
+# (Cline ignores allowed-tools metadata - manage via VS Code settings)
 ---
 
 # Job Scraper (Australian market)
@@ -29,13 +29,14 @@ new matches with a quick fit assessment.
 
 ## Invocation
 
-Triggered by: "Find new jobs", "Scrape for jobs", "Any new positions?", "/scrape".
+Triggered by: "Find new jobs", "Scrape for jobs", "Any new positions?".
 
-Optional arguments:
-- A focus area, e.g. "/scrape ai" or "/scrape full stack"
-- "broad" to run all priority categories
-- "remote" to hard-filter to remote/hybrid roles
-- "linkedin" to ALSO query LinkedIn (opt-in only — see Step 2b; off by default for ToS reasons)
+Additional arguments (if any) should be stated naturally as part of your request. For example:
+- "Scrape for full stack roles in Brisbane"
+- "Find new jobs, include LinkedIn"
+
+
+
 
 ---
 
