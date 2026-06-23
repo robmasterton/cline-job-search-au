@@ -58,7 +58,7 @@ export PATH="$PATH:$HOME/Library/TinyTeX/bin/universal-darwin"        # macOS
 
 # Install the packages this project needs (one command — saves you the trial-and-error)
 tlmgr install \
-  moderncv needspace marvosym fontawesome5 fontspec \
+  moderncv needspace marvosym fontawesome5 fontawesome6 fontspec \
   pgf luatexbase import xcolor microtype enumitem etoolbox geometry hyperref \
   l3packages l3kernel luaotfload ctablestack environ trimspaces xkeyval everysel \
   pdftexcmds infwarerr ltxcmds

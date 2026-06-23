@@ -96,7 +96,7 @@ If you provide `--section <name>` as part of your request, the assistant will di
 - **Path C: Interview mode:** The assistant will walk you through structured questions section by section. Good if you're starting from scratch.
 
 **Step A1: Inventory (Path A only)**
-The assistant will use Glob with `documents/**/*` to scan the full tree and print a summary of documents found. If every subfolder is empty, it will stop and tell you to populate the folder, pointing at `documents/README.md`.
+The assistant will list files recursively in `documents/` to scan the full tree and print a summary of documents found. If every subfolder is empty, it will stop and tell you to populate the folder, pointing at `documents/README.md`.
 
 **Step A2: Read Existing Skill Files (Path A only)**
 Before extracting anything, the assistant will read these files in parallel to understand what is already present and make the merge intelligent:
@@ -157,7 +157,7 @@ This workflow searches the Australian job market for new positions matching your
 For each priority category in `search-queries.md`, the assistant will run `seek_search.py` once per role-title keyword. By default, it runs the top 3 priority categories; if you say "broad", it runs all. If you give a focus area, it prioritizes that category's keywords.
 
 **Step 2: Search startup boards (secondary, optional)**
-For founding-engineer / AI-startup coverage, the assistant will run a few WebSearch queries over `wellfound.com`, `workatastartup.com`, and `job-boards.greenhouse.io`. It will only fetch a posting with WebFetch if it looks like a strong match AND is not a SEEK URL. It will verify Australia-eligibility before presenting.
+For founding-engineer / AI-startup coverage, the assistant will run a few web searches for `wellfound.com`, `workatastartup.com`, and `job-boards.greenhouse.io`. It will only fetch a posting if it looks like a strong match AND is not a SEEK URL. It will verify Australia-eligibility before presenting.
 
 **Step 2b: LinkedIn (OPT-IN ONLY — never run by default)**
 This step only runs if you explicitly opt in (e.g., say "include LinkedIn"). The assistant will briefly remind you it's at-your-own-risk, then run `linkedin_search.py`. It will keep volume low and merge LinkedIn results into the same dedup/ranking as SEEK.
@@ -184,7 +184,7 @@ This workflow evaluates a job, drafts a tailored CV and cover letter, and helps 
 **Step 0: Parse Input**
 - If a `seek.com.au` URL (or bare SEEK job id) is provided, the assistant will use the `seek_search.py` CLI with `--detail` to fetch the full posting content (title, company, location, salary, work_type, status, recruiter_phone, and description).
 - If a `linkedin.com/jobs` URL (or LinkedIn job id) is provided, the assistant will use the optional `linkedin_search.py` CLI with `--detail` to fetch the full posting content. If it fails or you prefer not to use it, the assistant will ask you to paste the description instead.
-- If any other URL is provided, the assistant will use `WebFetch` to retrieve the content.
+- If any other URL is provided, the assistant will fetch the URL content to retrieve the job posting.
 - If it is pasted text, it will be used directly. The assistant will extract the company name, role title, department (if mentioned), and location.
 
 **Step 1: Evaluate Fit**
@@ -194,10 +194,10 @@ The assistant will read `04-job-evaluation.md` and `01-candidate-profile.md`. It
 If you proceed, the assistant will read `03-writing-style.md`, `05-cv-templates.md`, and `06-cover-letter-templates.md`, as well as recent existing CV and cover letter files for structural reference. It will then draft a tailored CV (`cv/main_<company>.tex`) and cover letter (`cover_letters/cover_<company>_<role>.tex`) in English, following the templates and tailoring content to the specific role and company. It will keep the exact text of both drafts in working memory.
 
 **Step 3: Review & Critique**
-Instead of a sub-agent, the assistant will now perform an inline review. It will research the company using `WebSearch` and `WebFetch`, then critique the CV and cover letter drafts against `01-candidate-profile.md`, `02-behavioral-profile.md`, `03-writing-style.md`, and `04-job-evaluation.md`. It will produce structured edits (JSON array) and narrative suggestions (prose feedback) to improve the application. All suggestions will be grounded in actual profile data, without fabricating skills or experience.
+The assistant will perform an inline review. It will research the company using web search and fetching relevant URLs, then critique the CV and cover letter drafts against `01-candidate-profile.md`, `02-behavioral-profile.md`, `03-writing-style.md`, and `04-job-evaluation.md`. It will produce structured edits (JSON array) and narrative suggestions (prose feedback) to improve the application. All suggestions will be grounded in actual profile data, without fabricating skills or experience.
 
 **Step 4: Revise Based on Feedback**
-The assistant will apply the structured edits directly using the `Edit` tool. It will then apply the narrative suggestions using its judgment, addressing missed keywords, company-specific angles, action-oriented reframing, and tone/style issues. It will verify company claims via `WebFetch`/`WebSearch` before incorporating them.
+The assistant will apply the structured edits directly using its file editing capabilities. It will then apply the narrative suggestions using its judgment, addressing missed keywords, company-specific angles, action-oriented reframing, and tone/style issues. It will verify company claims via search and fetch before incorporating them.
 
 **Step 5: Compile & Inspect PDFs (MANDATORY)**
 The assistant will compile the CV with `lualatex` and the cover letter with `xelatex`. It will then read both PDFs and visually inspect them to ensure they are exactly 2 pages (CV) and 1 page (cover letter), with no orphaned titles, awkward gaps, or font mismatches. If layout problems exist, it will edit the `.tex` files and recompile until clean. Finally, it will clean up build artifacts.
@@ -245,7 +245,7 @@ The assistant will present a confirmation prompt: "This cannot be undone. Type `
 
 **Step 3: Execute the Reset**
 - **Profile reset:** `01-candidate-profile.md` and `02-behavioral-profile.md` will be replaced with blank templates. Profile statement templates in `05-cv-templates.md` and STAR examples in `07-interview-prep.md` will be cleared.
-- **Documents reset:** All files within `documents/cv/`, `documents/linkedin/`, `documents/diplomas/`, `documents/references/`, and `documents/applications/` will be deleted using `rm`.
+- **Documents reset:** All files within `documents/cv/`, `documents/linkedin/`, `documents/diplomas/`, `documents/references/`, and `documents/applications/` will be deleted.
 
 **Step 4: Confirm What Was Done and Next Steps**
 After the reset, the assistant will report what was cleared and what remained unchanged. It will then tell you what to do next based on what was reset (e.g., run `setup` to repopulate your profile).
@@ -258,7 +258,7 @@ After creating or updating a CV or cover letter, re-read the generated file and 
 - [ ] All claims match actual profile (CLAUDE.md / candidate profile) - no fabricated skills, experience, or achievements
 - [ ] Job titles, dates, company names, and locations are correct
 - [ ] Contact details are correct
-- [ ] All company-specific claims (partnerships, products, technology, expansions) have been independently verified via WebFetch/WebSearch - do not trust reviewer agent research without verification
+- [ ] All company-specific claims (partnerships, products, technology, expansions) have been independently verified via web search and URL fetching - do not trust unaided research without verification
 
 ### Targeting
 - [ ] Profile statement / opening paragraph is tailored to the specific role (not generic)
@@ -280,9 +280,9 @@ After creating or updating a CV or cover letter, re-read the generated file and 
 - [ ] Cover letter fits approximately one page
 
 ### Compiled PDF verification (MANDATORY - never skip)
-Both documents MUST be compiled and visually inspected via the Read tool on the PDF output. "Looks fine in the .tex" is not acceptable - LaTeX page-break decisions are unpredictable. Iterate until these all pass:
+Both documents MUST be compiled and visually inspected by reading the PDF output. "Looks fine in the .tex" is not acceptable - LaTeX page-break decisions are unpredictable. Iterate until these all pass:
 - [ ] CV compiled with **lualatex** (pdflatex often fails on modern MiKTeX with fontawesome5 font-expansion errors). Cover letter compiled with **xelatex** (cover.cls requires fontspec).
 - [ ] **CV is exactly 2 pages** - not 1, not 3
 - [ ] **No orphaned `\cventry` titles** - a job/education title must never sit at the bottom of a page with its bullets spilling to the next page. Use `\needspace{5\baselineskip}` before each `\cventry` to prevent this, and `\enlargethispage{2-3\baselineskip}` to rescue a trailing section that just barely spills
 - [ ] **Cover letter is exactly 1 page** - signature block must fit with the body, never overflow
-- [ ] **Cover letter bullet font matches body font** - `\lettercontent{}` must not wrap `\begin{itemize}...\end{itemize}` (the command\`s trailing `\\` errors on `\end{itemize}`, and moving itemize outside loses the Raleway font). Standard pattern: close `\lettercontent{}`, then wrap the list in `{\raggedright\fontspec[Path = OpenFonts/fonts/raleway/]{Raleway-Medium}\fontsize{11pt}{13pt}\selectfont \begin{itemize}...\end{itemize}\par}`
+- [ ] **Cover letter bullet font matches body font** - `\lettercontent{}` must not wrap `\begin{itemize}...\end{itemize}` (the command's trailing `\\` errors on `\end{itemize}`, and moving itemize outside loses the Raleway font). Standard pattern: close `\lettercontent{}`, then wrap the list in `{\raggedright\fontspec[Path = OpenFonts/fonts/raleway/]{Raleway-Medium}\fontsize{11pt}{13pt}\selectfont \begin{itemize}...\end{itemize}\par}

@@ -19,9 +19,9 @@ This skill discovers Australian job postings using two channels:
    SEEK's JSON API directly and returns structured jobs (title, company, location, salary,
    remote/hybrid, teaser, URL). SEEK is the largest Australian board and its HTML pages are
    Cloudflare-blocked, so the CLI is the only reliable way in.
-2. **Startup / ATS boards — secondary.** `WebSearch` over Wellfound, Y Combinator, and
+2. **Startup / ATS boards — secondary.** Web search over Wellfound, Y Combinator, and
    Greenhouse/Lever/Ashby for founding-engineer and AI-startup roles SEEK under-indexes.
-   (`WebSearch` is US-region, so treat its AU results as supplementary and verify
+   (Web search is US-region-biased, so treat its AU results as supplementary and verify
    AU-eligibility before presenting.)
 
 It then deduplicates against previously seen jobs and the application tracker, and presents
@@ -34,9 +34,6 @@ Triggered by: "Find new jobs", "Scrape for jobs", "Any new positions?".
 Additional arguments (if any) should be stated naturally as part of your request. For example:
 - "Scrape for full stack roles in Brisbane"
 - "Find new jobs, include LinkedIn"
-
-
-
 
 ---
 
@@ -64,20 +61,20 @@ python3 seek_search.py --keywords "<role title>" --where "All Australia" --remot
 python3 seek_search.py --keywords "<role title>" --where "<location>" --days 14 --pages 2
 ```
 
-- Run the CLI via the **Bash** tool. It prints a JSON array — parse it directly.
+- Run the CLI via command execution. It prints a JSON array — parse it directly.
 - Use the candidate's configured location tiers from `search-queries.md` for `--where`.
 - Batch the keyword calls; each is fast.
 
 ### Step 2: Search startup boards (secondary, optional)
 
-For founding-engineer / AI-startup coverage, run a few `WebSearch` queries over
+For founding-engineer / AI-startup coverage, run a few web searches over
 `wellfound.com`, `workatastartup.com`, and `job-boards.greenhouse.io`. Only fetch a posting
-with `WebFetch` if it looks like a strong match AND is not a SEEK URL (SEEK 403s). Verify
+if it looks like a strong match AND is not a SEEK URL (SEEK 403s). Verify
 Australia-eligibility before presenting — many board results are US-only.
 
 ### Step 2b: LinkedIn (OPT-IN ONLY — never run by default)
 
-Only run this if the user explicitly opted in (said "linkedin", "/scrape linkedin", or asked
+Only run this if the user explicitly opted in (said "linkedin", "include linkedin", or asked
 for LinkedIn). **Do not query LinkedIn otherwise** — automating it is against LinkedIn's ToS,
 so it is off by default. When opted in, briefly remind the user it's at-their-own-risk, then:
 
@@ -87,7 +84,7 @@ python3 linkedin_search.py --keywords "<role title>" --where "Australia" --days 
 ```
 
 Keep volume low (a few keyword calls). Merge LinkedIn results into the same dedup/ranking as
-SEEK. For a full description or `/apply`, use `linkedin_search.py --detail <id|url>`.
+SEEK. For a full description or when applying, use `linkedin_search.py --detail <id|url>`.
 
 ### Step 3: Deduplicate
 
@@ -148,7 +145,7 @@ only returns a teaser):
 ```bash
 cd tools/seek-search && python3 seek_search.py --detail "<seek url or id>"
 ```
-Then run the **job-application-assistant** workflow (or `/apply`) on that full description.
+Then run the job-application-assistant workflow on that full description.
 
 ### Step 7: Update Tracker (Optional)
 
@@ -165,6 +162,6 @@ If the user decides to apply, add a row to `job_search_tracker.csv`.
 4. **Only open positions.** The CLI returns live listings; still skip anything clearly stale.
 5. **Full SEEK descriptions ARE fetchable** via `seek_search.py --detail <id|url>` (GraphQL).
    The search step returns only a teaser; pull the full body with `--detail` before a full
-   fit eval or `/apply`. No manual paste needed for SEEK URLs.
-6. **Efficiency.** Batch CLI keyword calls; don't WebFetch every result — pre-filter on
+   fit eval or applying. No manual paste needed for SEEK URLs.
+6. **Efficiency.** Batch CLI keyword calls; don't fetch every result — pre-filter on
    title/teaser/salary first.
